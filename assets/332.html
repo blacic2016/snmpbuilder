@@ -196,29 +196,12 @@
   </div>
 
   <div class="config-panel">
-    <div class="mb-3 d-flex align-items-center">
-      <div class="btn-group btn-group-toggle" data-toggle="buttons" id="mode-toggle">
-        <label class="btn btn-primary active">
-          <input type="radio" name="mode" id="mode_zabbix" checked> <i class="fas fa-server mr-1"></i> Modo Zabbix
-        </label>
-        <label class="btn btn-secondary">
-          <input type="radio" name="mode" id="mode_manual"> <i class="fas fa-edit mr-1"></i> Modo Manual
-        </label>
-      </div>
-      <span class="ml-3 text-muted small"><i class="fas fa-info-circle"></i> Selecciona cómo quieres ingresar los datos del equipo.</span>
-    </div>
 
     <div class="config-bar">
       <div class="config-item">
         <label for="mib">Carpetas Mib</label>
         <select name="mib" id="mib" class="selectpicker show-tick form-control" data-live-search="true">
           <option value="" disabled selected>Seleccionar MIB</option>
-        </select>
-      </div>
-      <div class="config-item" id="container_ip_zabbix" style="min-width: 250px;">
-        <label>Seleccionar Equipo (Zabbix)</label>
-        <select id="iphost_select" class="selectpicker show-tick form-control" data-live-search="true">
-          <option value="">Buscar en Zabbix...</option>
         </select>
       </div>
       <div class="config-item" id="container_ip_manual">
@@ -286,74 +269,11 @@
       $(document).ready(function () {
         try {
           cargarOpcionesMib();
-          cargarEquiposZabbix();
           $('[data-toggle="tooltip"]').tooltip();
         } catch (error) {
           console.error('Error en el código jQuery:', error);
         }
       });
-
-      function cargarEquiposZabbix() {
-        $.ajax({
-          url: "get_zabbix_hosts.php",
-          dataType: "json",
-          success: function (res) {
-            if (res.error) {
-              console.error("Error cargando equipos:", res.error);
-              return;
-            }
-            let select = $("#iphost_select");
-            select.empty();
-            select.append('<option value="">Seleccionar Equipo...</option>');
-            
-            window.zabbixHostsData = res.result; // Guardar datos para acceso rápido
-            
-            res.result.forEach(function(host) {
-              select.append('<option value="'+host.ip+'" data-subtext="'+host.ip+'">'+host.name+'</option>');
-            });
-            select.selectpicker("refresh");
-          }
-        });
-      }
-
-      $("#iphost_select").on("change", function() {
-        let ip = $(this).val();
-        if (ip) {
-          $("#iphost").val(ip);
-        }
-        
-        // Buscar datos del host seleccionado
-        let hostData = window.zabbixHostsData.find(h => h.ip === ip);
-        if (hostData) {
-          $("#comunidad").val(hostData.community);
-          
-          let version = hostData.version;
-          if (version == "2") version = "2c";
-          $("#snmpversion").selectpicker("val", version);
-          $("#snmpversion").selectpicker("refresh");
-        }
-      });
-
-      // Lógica del switch de modo
-      $('input[name="mode"]').change(function() {
-        if (this.id === 'mode_zabbix') {
-          $("#container_ip_zabbix").show();
-          $("#iphost").attr('readonly', true);
-          $("#comunidad").attr('readonly', true);
-          $("#mode-toggle label").first().addClass('active').removeClass('btn-secondary').addClass('btn-primary');
-          $("#mode-toggle label").last().removeClass('active').addClass('btn-secondary').removeClass('btn-primary');
-        } else {
-          $("#container_ip_zabbix").hide();
-          $("#iphost").attr('readonly', false).val('');
-          $("#comunidad").attr('readonly', false).val('');
-          $("#mode-toggle label").first().removeClass('active').addClass('btn-secondary').removeClass('btn-primary');
-          $("#mode-toggle label").last().addClass('active').removeClass('btn-secondary').addClass('btn-primary');
-        }
-      });
-
-      // Inicializar estado del modo
-      $("#iphost").attr('readonly', true);
-      $("#comunidad").attr('readonly', true);
     } else {
       console.error('Error: jQuery no está disponible.');
     }
