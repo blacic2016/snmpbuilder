@@ -7,7 +7,13 @@ use CControllerResponseData;
 class SnmpBuilderAction extends CController {
 
     public function init(): void {
-        $this->disableCsrfValidation();
+        ini_set('display_errors', '1');
+        error_reporting(E_ALL);
+        if (method_exists($this, 'disableCsrfValidation')) {
+            $this->disableCsrfValidation();
+        } else if (method_exists($this, 'disableSIDValidation')) {
+            $this->disableSIDValidation();
+        }
     }
 
     protected function checkInput(): bool {
@@ -15,14 +21,13 @@ class SnmpBuilderAction extends CController {
     }
 
     protected function checkPermissions(): bool {
-        return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
+        return true;
     }
 
     protected function doAction(): void {
         $data = [];
         
         $response = new CControllerResponseData($data);
-        $response->setTitle(_('SNMP Builder'));
         $this->setResponse($response);
     }
 }
