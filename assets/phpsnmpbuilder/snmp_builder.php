@@ -22,8 +22,8 @@
 // This is distributed under Free-BSD licence.
 ?>
 <?php
-
-require_once __DIR__ . '/../../../config.php';
+// Zabbix module: removed config.php dependency
+define('SNMP_MIBS_PATH', __DIR__ . '/../mibs');
 define('MIBS_ALL_PATH', SNMP_MIBS_PATH . ':/usr/share/snmp/mibs');
 
 require_once('include/config.inc.php');
