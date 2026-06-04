@@ -5,7 +5,6 @@
  */
 
 (new CHtmlPage())
-    ->setTitle(_('SNMP Builder'))
     ->addItem(
         (new CDiv())
             ->addClass('snmp-container')

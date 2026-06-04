@@ -198,11 +198,15 @@
   <div class="config-panel">
 
     <div class="config-bar">
-      <div class="config-item">
+      <div class="config-item" style="display: flex; flex-direction: column;">
         <label for="mib">Carpetas Mib</label>
-        <select name="mib" id="mib" class="selectpicker show-tick form-control" data-live-search="true">
-          <option value="" disabled selected>Seleccionar MIB</option>
-        </select>
+        <div class="d-flex">
+          <select name="mib" id="mib" class="selectpicker show-tick form-control" data-live-search="true" style="flex: 1;">
+            <option value="" disabled selected>Seleccionar MIB</option>
+          </select>
+          <button class="btn btn-success ml-2" id="btn_nueva_mib" title="Subir Nueva MIB" style="height: 35px;"><i class="fas fa-upload"></i></button>
+          <input type="file" id="mib_file_input" accept=".mib,.txt,.my,.*" style="display: none;">
+        </div>
       </div>
       <div class="config-item" id="container_ip_manual">
         <label for="iphost">IP Host/equipo</label>
@@ -270,6 +274,49 @@
         try {
           cargarOpcionesMib();
           $('[data-toggle="tooltip"]').tooltip();
+
+          // Lógica de subir nueva MIB
+          $("#btn_nueva_mib").click(function() {
+            $("#mib_file_input").click();
+          });
+
+          $("#mib_file_input").change(function() {
+            if (this.files.length > 0) {
+              var file = this.files[0];
+              var formData = new FormData();
+              formData.append("mib_file", file);
+              
+              let btn = $("#btn_nueva_mib");
+              let icon = btn.find("i");
+              icon.removeClass("fa-upload").addClass("fa-spinner fa-spin");
+              btn.prop("disabled", true);
+              
+              $.ajax({
+                url: "upload_mib.php",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                  if(res.success) {
+                    alert("MIB '" + res.filename + "' subida exitosamente.");
+                    cargarOpcionesMib(); // Refrescar la lista de MIBs
+                  } else {
+                    alert("Error: " + (res.error || "Desconocido"));
+                  }
+                },
+                error: function() {
+                  alert("Error al comunicarse con el servidor al subir la MIB.");
+                },
+                complete: function() {
+                  icon.removeClass("fa-spinner fa-spin").addClass("fa-upload");
+                  btn.prop("disabled", false);
+                  $("#mib_file_input").val(""); // Resetear input
+                }
+              });
+            }
+          });
+
         } catch (error) {
           console.error('Error en el código jQuery:', error);
         }
