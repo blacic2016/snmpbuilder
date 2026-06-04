@@ -1,0 +1,14 @@
+{
+    "manifest_version": 2.0,
+    "id": "snmp-builder",
+    "name": "SNMP Builder",
+    "version": "1.0",
+    "namespace": "SnmpBuilder",
+    "description": "SNMP Builder Module for Zabbix.",
+    "actions": {
+        "snmp.builder": {
+            "class": "SnmpBuilderAction",
+            "view": "snmpbuilder.view"
+        }
+    }
+}
